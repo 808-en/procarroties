@@ -1,15 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title data-i18n="pageTitle">Pro Carroties</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="slideshow-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://kit.fontawesome.com/cd38709ddf.js" crossorigin="anonymous"></script>
+    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="logo.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="logo.ico">
+<style>
+
+</style>
+</head>
 <body>
-​
-<h1>The audio autoplay attribute</h1>
-​
-<p>Click on the play button to play a sound:</p>
-​
-<audio controls autoplay>
-  <source src="https://w.soundcloud.com/player/?url=http%3A//api.soundcloud.com/tracks/1336530988?show_artwork=true&buying=true&show_comments=true&download=true&liking=true&show_playcount=true&sharing=true&show_user=true&visual=false" >
-  Your browser does not support the audio element.
-</audio>
-​
+
+<header><h1><img src="https://i.imgur.com/pi6fKBr.png" border="0"></h1>
+<img src="logo.png"><div class="subCount"><iframe height="90px" width="400px" frameborder="0" src="https://socialcounts.org/youtube-live-subscriber-count/UC3AQYBCEMYlw6mlpHWPm-MA/embed" allowFullScreen></iframe></div></header>
+<h1 class="subscribe-button"><button onclick="window.location.href='https://youtube.com/@bloxdPRO_Carrot'"><i class="fa fa-youtube-play" style="font-size:100px;color:red"></i></button><div style="">Please Subscribe To Our Channel!
+</div></h1>
+
+    <div id="musicPopup" class="popup-overlay">
+        <div class="popup-content">
+            <p>Would you like to listen to music while you browse?</p>
+            <button id="noThanksBtn">No, thanks</button>
+            <button id="listenBtn" class="blue-button">Listen in browser</button>
+        </div>
+    </div>
+
+    <audio id="backgroundMusic" src="music-file.mp3" preload="auto" loop></audio>
+
+
+<div class="txt-p" style="font-size:30px">
+<ul>
+
+<li>Explore the world, From beating MiniGames, roleplaying, to becoming the strongest and richest player,
+This is the Official Website of the Bloxd Lobby, procarroties.</li>
+
+<li><button style="background-color:#012F7B; color:#FFA500;" onclick="window.location.href='https://bloxd.io/?lobby=pro_carroties&g=worlds'"><img style="height:25px; width:25px;" src="https://bloxd.company/logo.png"></img>Launch Game</button>&#x2190;Our Lobby</li>
+
+</ul>
+</div>
+<div style="text-align:center;">
+<button style="background-color: skyblue; color: white" onclick="window.location.href='login.html'">Edit Photoroll</button></div>
+<section id="slideshow-region" class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div id="slideshow-container" class="slideshow-container">
+        <img id="slideshow-image" class="slideshow-image opacity-0" src="https://placehold.co/800x450/cccccc/333333?text=Loading..." alt="Loading slideshow">
+
+        <a class="prev" onclick="prevSlide()">&#10094;</a>
+        <a class="next" onclick="nextSlide()">&#10095;</a>
+
+        <div id="slide-indicators" class="dot-container">
+            <!-- Dots will be dynamically added here -->
+        </div>
+    </div>
+</section>
+<footer>
+<h3>Credits:</h3><ul>
+<li>Website: Entity1234 on Bloxd</li>
+<li>Minecraft Font: Entity1234 on Bloxd</li>
+
+<li>Lobby Builders:
+Dros, Buddy, havok, PROGAMINGSG, THEREALCARROTMAN, LightKnightBloxd, Itzyt, Samuyoutuber, fred5orange, W Mon Gaming, Richard, Mukti Chiran, RealJohann</li>
+</ul>
+</footer>
 </body>
+<script src="script.js"></script>
+<script src="slideshow-script.js"></script>
 </html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="logo.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="logo.ico">
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 2rem;
+        }
+        .btn {
+            @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg;
+        }
+        .btn-primary {
+            @apply bg-blue-600 text-white hover:bg-blue-700;
+        }
+        .btn-danger {
+            @apply bg-red-600 text-white hover:bg-red-700;
+        }
+        .modal {
+            @apply fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4 z-50;
+        }
+        .modal-content {
+            @apply bg-white p-6 rounded-xl shadow-2xl w-full max-w-md;
+        }
+        .message-box {
+            display: none; /* Hidden by default */
+        }
+        .form-group {
+            @apply mb-4;
+        }
+        .form-label {
+            @apply block text-sm font-medium text-gray-700 mb-1;
+        }
+        .form-input {
+            @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500;
+        }
+        .form-select {
+            @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500;
+        }
+        .image-checkbox:checked {
+            @apply border-blue-600 bg-blue-600;
+        }
+        .delete-gallery-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0; /* gray-200 */
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+        }
+        .delete-gallery-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .delete-gallery-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .delete-gallery-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .delete-gallery-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="container">
+        <h1 class="text-3xl font-bold text-center mb-8 text-red-800"><a href="index.html">Logout</a></h1>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Slideshow Admin Panel</h1>
+
+        <!-- Message Box -->
+        <div id="message-box" class="message-box"></div>
+
+        <!-- Local Storage Warning -->
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-md" role="alert">
+            <p class="font-bold">Important Note for File Uploads:</p>
+            <p class="text-sm">Uploaded images are stored directly in your browser's local storage as Base64 data. This has a limited capacity (typically 5-10 MB). Uploading many or very large images may cause the application to stop working or perform slowly. This data is also browser-specific and will not sync across devices.</p>
+<p>=============== Ein Deutsch ===============</p>
+<p>Hochgeladene Bilder werden direkt im lokalen Speicher Ihres Browsers als Base64-Daten gespeichert. Dies hat eine begrenzte Kapazität (in der Regel 5-10 MB). Das Hochladen vieler oder sehr großer Bilder kann dazu führen, dass die Anwendung nicht mehr funktioniert oder langsam funktioniert. Diese Daten sind auch browserspezifisch und werden nicht geräteübergreifend synchronisiert.</p>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-4 mb-8 justify-center">
+            <button onclick="openAddPictureForm()" class="btn btn-primary">
+                <i class="fas fa-plus-circle mr-2"></i> Add New Picture
+            </button>
+            <button onclick="showDeletePictures()" class="btn btn-danger">
+                <i class="fas fa-trash-alt mr-2"></i> Manage / Delete Pictures
+            </button>
+        </div>
+
+        <!-- Add Picture Modal -->
+        <div id="add-picture-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">Add New Picture</h2>
+                <form id="add-picture-form" onsubmit="addNewPicture(event)">
+                    <div class="form-group">
+                        <label for="input-type" class="form-label">Choose Input Type:</label>
+                        <select id="input-type" class="form-select" onchange="handleInputTypeChange()">
+                            <option value="">-- Select --</option>
+                            <option value="link">Image URL</option>
+                            <option value="gdrive">Google Drive Link (Public URL)</option>
+                            <option value="localFile">Upload Local File</option>
+                        </select>
+                    </div>
+
+                    <div id="link-input-group" class="form-group hidden">
+                        <label for="image-link" class="form-label">Image URL:</label>
+                        <input type="url" id="image-link" class="form-input" placeholder="e.g., https://example.com/my-image.jpg">
+                    </div>
+
+                    <div id="gdrive-link-input-group" class="form-group hidden">
+                        <label for="gdrive-link" class="form-label">Google Drive Link (Paste Public Image URL):</label>
+                        <input type="url" id="gdrive-link" class="form-input" placeholder="e.g., https://drive.google.com/uc?export=view&id=FILE_ID">
+                        <p class="text-sm text-gray-500 mt-1">Ensure the Google Drive link is set to "Anyone with the link" and provides a direct image URL.</p>
+                    </div>
+
+                    <div id="local-file-upload-group" class="form-group hidden">
+                        <label for="local-uploaded-file" class="form-label">Select Image File from your device:</label>
+                        <input type="file" id="local-uploaded-file" class="form-input p-1" accept="image/*">
+                        <p class="text-sm text-gray-500 mt-1">Images will be stored in your browser's local storage.</p>
+                    </div>
+
+                    <div class="flex justify-end space-x-4 mt-6">
+                        <button type="button" onclick="closeAddPictureForm()" class="btn bg-gray-300 text-gray-800 hover:bg-gray-400 shadow-none">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Picture</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Delete Pictures Section -->
+        <div id="delete-pictures-section" class="hidden bg-white p-6 rounded-xl shadow-md">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">Manage / Delete Pictures</h2>
+            <div class="delete-gallery-container mb-4">
+                <div id="delete-gallery" class="space-y-2">
+                    <p class="text-gray-600">Loading images...</p>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 justify-end">
+                <button onclick="deleteSelectedPictures()" class="btn btn-danger">
+                    <i class="fas fa-minus-circle mr-2"></i> Delete Selected
+                </button>
+                <button onclick="confirmDeleteAll()" style="border-radius:10px;" class="btn bg-red-800 text-white hover:bg-red-900">
+                    <i class="fas fa-bomb mr-2"></i> Delete All Pictures
+                </button>
+                <button onclick="hideDeletePictures()" style="border-radius:10px;" class="btn bg-gray-300 text-gray-800 hover:bg-gray-400">
+                    <i class="fas fa-times-circle mr-2"></i> Close Management
+                </button>
+            </div>
+        </div>
+
+        <!-- Delete All Confirmation Modal -->
+        <div id="delete-all-confirmation-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">Confirm Deletion</h2>
+                <p class="mb-6 text-gray-700">Are you sure you want to delete ALL pictures from the gallery? This action cannot be undone.</p>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" onclick="cancelDeleteAll()" class="btn bg-gray-300 text-gray-800 hover:bg-gray-400 shadow-none">Cancel</button>
+                    <button type="button" onclick="deleteAllPictures()" class="btn btn-danger">Yes, Delete All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'slideshow_images'; // Key for localStorage
+        let currentImages = []; // Array to hold images for deletion view
+
+        function generateUniqueId() {
+            return '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function loadImages() {
+            const storedImages = localStorage.getItem(STORAGE_KEY);
+            if (storedImages) {
+                try {
+                    return JSON.parse(storedImages);
+                } catch (e) {
+                    console.error("Error parsing stored images from localStorage:", e);
+                    return [];
+                }
+            }
+            return [];
+        }
+
+        function saveImages(images) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(images));
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        function showMessage(msg, type) {
+            const messageBox = document.getElementById('message-box');
+            messageBox.textContent = msg;
+            messageBox.className = `message-box p-3 rounded-md mb-4 text-center ${type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`;
+            messageBox.style.display = 'block';
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 5000); // Hide after 5 seconds
+        }
+
+        function openAddPictureForm() {
+            document.getElementById('add-picture-modal').classList.remove('hidden');
+        }
+
+        function closeAddPictureForm() {
+            document.getElementById('add-picture-modal').classList.add('hidden');
+            document.getElementById('add-picture-form').reset();
+            // Reset visibility of all input groups
+            document.getElementById('link-input-group').classList.add('hidden');
+            document.getElementById('gdrive-link-input-group').classList.add('hidden');
+            document.getElementById('local-file-upload-group').classList.add('hidden');
+        }
+
+        function handleInputTypeChange() {
+            const inputType = document.getElementById('input-type').value;
+            // Hide all first
+            document.getElementById('link-input-group').classList.add('hidden');
+            document.getElementById('gdrive-link-input-group').classList.add('hidden');
+            document.getElementById('local-file-upload-group').classList.add('hidden');
+
+            // Show relevant one
+            if (inputType === 'link') {
+                document.getElementById('link-input-group').classList.remove('hidden');
+            } else if (inputType === 'gdrive') {
+                document.getElementById('gdrive-link-input-group').classList.remove('hidden');
+            } else if (inputType === 'localFile') {
+                document.getElementById('local-file-upload-group').classList.remove('hidden');
+            }
+        }
+
+        function addNewPicture(event) {
+            event.preventDefault();
+
+            const inputType = document.getElementById('input-type').value;
+            let imageUrl = '';
+            let file = null;
+
+            if (inputType === 'link') {
+                imageUrl = document.getElementById('image-link').value;
+            } else if (inputType === 'gdrive') {
+                imageUrl = document.getElementById('gdrive-link').value;
+            } else if (inputType === 'localFile') {
+                file = document.getElementById('local-uploaded-file').files[0];
+            }
+
+            if (!inputType) {
+                showMessage("Please select an input type.", 'error');
+                return;
+            }
+
+            if (inputType !== 'localFile' && (!imageUrl || (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')))) {
+                showMessage("Please enter a valid URL (must start with http:// or https://).", 'error');
+                return;
+            }
+
+            if (inputType === 'localFile') {
+                if (!file) {
+                    showMessage("Please select a file to upload.", 'error');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onloadend = function() {
+                    const base64Data = reader.result;
+                    const images = loadImages();
+                    images.push({ id: generateUniqueId(), url: base64Data, timestamp: Date.now() });
+                    saveImages(images);
+                    showMessage("Picture added successfully!", 'success');
+                    closeAddPictureForm();
+                    renderDeleteImages(); // Re-render the delete list
+                };
+                reader.onerror = function() {
+                    showMessage("Error reading file.", 'error');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                const images = loadImages();
+                images.push({ id: generateUniqueId(), url: imageUrl, timestamp: Date.now() });
+                saveImages(images);
+                showMessage("Picture added successfully!", 'success');
+                closeAddPictureForm();
+                renderDeleteImages(); // Re-render the delete list
+            }
+        }
+
+        function showDeletePictures() {
+            document.getElementById('delete-pictures-section').classList.remove('hidden');
+            renderDeleteImages();
+        }
+
+        function hideDeletePictures() {
+            document.getElementById('delete-pictures-section').classList.add('hidden');
+        }
+
+        function renderDeleteImages() {
+            currentImages = loadImages(); // Always load fresh data
+            currentImages.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0)); // Sort by timestamp
+
+            const galleryContainer = document.getElementById('delete-gallery');
+            galleryContainer.innerHTML = ''; // Clear previous images
+
+            if (currentImages.length === 0) {
+                galleryContainer.innerHTML = '<p class="text-gray-600">No images to display.</p>';
+                return;
+            }
+
+            currentImages.forEach(image => {
+                const imageDiv = document.createElement('div');
+                imageDiv.classList.add('flex', 'items-center', 'space-x-3', 'p-2', 'border-b', 'border-gray-200');
+                const displayUrl = image.url.length > 50 ? image.url.substring(0, 47) + '...' : image.url;
+
+                imageDiv.innerHTML = `
+                    <input type="checkbox" class="image-checkbox form-checkbox h-5 w-5 text-blue-600 rounded" data-id="${image.id}">
+                    <img src="${image.url}" alt="Gallery Image" class="w-24 h-24 object-cover rounded-md flex-shrink-0">
+                    <span class="text-sm text-gray-700 truncate flex-grow">${displayUrl}</span>
+                    <button onclick="deleteSinglePicture('${image.id}')" class="text-red-500 hover:text-red-700 p-2 rounded-full focus:outline-none transition-colors duration-200">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                `;
+                galleryContainer.appendChild(imageDiv);
+            });
+        }
+
+        function deleteSinglePicture(id) {
+            let images = loadImages();
+            const initialLength = images.length;
+            images = images.filter(image => image.id !== id);
+            if (images.length < initialLength) {
+                saveImages(images);
+                showMessage("Picture deleted successfully!", 'success');
+                renderDeleteImages(); // Re-render the list
+            } else {
+                showMessage("Picture not found.", 'error');
+            }
+        }
+
+        function deleteSelectedPictures() {
+            const checkboxes = document.querySelectorAll('.image-checkbox:checked');
+            if (checkboxes.length === 0) {
+                showMessage("No pictures selected.", 'error');
+                return;
+            }
+
+            let images = loadImages();
+            const idsToDelete = Array.from(checkboxes).map(cb => cb.dataset.id);
+            images = images.filter(image => !idsToDelete.includes(image.id));
+
+            saveImages(images);
+            showMessage(`${checkboxes.length} pictures deleted successfully!`, 'success');
+            renderDeleteImages(); // Re-render the list
+        }
+
+        function confirmDeleteAll() {
+            document.getElementById('delete-all-confirmation-modal').classList.remove('hidden');
+        }
+
+        function cancelDeleteAll() {
+            document.getElementById('delete-all-confirmation-modal').classList.add('hidden');
+        }
+
+        function deleteAllPictures() {
+            cancelDeleteAll(); // Close the confirmation modal
+            saveImages([]); // Save an empty array
+            showMessage("All pictures deleted successfully!", 'success');
+            renderDeleteImages(); // Re-render the list
+        }
+
+        window.onload = renderDeleteImages;
+    </script>
+</body>
+</html>
