@@ -11,7 +11,16 @@
     <link rel="shortcut icon" href="logo.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="logo.ico">
 <style>
-
+.music-icon {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    font-size: 30px;
+    color: #4CAF50;
+    cursor: pointer;
+    z-index: 1000;
+    display: none;
+}
 </style>
 </head>
 <body>
@@ -21,16 +30,19 @@
 <h1 class="subscribe-button"><button onclick="window.location.href='https://youtube.com/@bloxdPRO_Carrot'"><i class="fa fa-youtube-play" style="font-size:100px;color:red"></i></button><div style="">Please Subscribe To Our Channel!
 </div></h1>
 
-    <div id="musicPopup" class="popup-overlay">
-        <div class="popup-content">
-            <p>Would you like to listen to music while you browse?</p>
-            <button id="noThanksBtn">No, thanks</button>
-            <button id="listenBtn" class="blue-button">Listen in browser</button>
-        </div>
+<div id="musicPopup" class="popup-overlay">
+    <div class="popup-content">
+        <p>Would you like to listen to music while you browse?</p>
+        <button id="noThanksBtn">No, thanks</button>
+        <button id="listenBtn" class="blue-button">Listen in browser</button>
     </div>
+</div>
 
-    <audio id="backgroundMusic" src="https://archive.org/embed/ModjoLadyHearMeTonight" preload="auto" loop></audio>
+<div id="musicIcon" class="music-icon">
+    <i class="fas fa-music"></i>
+</div>
 
+<audio id="backgroundMusic" src="https://archive.org/download/ModjoLadyHearMeTonight/Modjo-LadyHearMeTonight.mp3" preload="auto" loop></audio>
 
 <div class="txt-p" style="font-size:30px">
 <ul>
@@ -53,8 +65,7 @@ This is the Official Website of the Bloxd Lobby, procarroties.</li>
         <a class="next" onclick="nextSlide()">&#10095;</a>
 
         <div id="slide-indicators" class="dot-container">
-            <!-- Dots will be dynamically added here -->
-        </div>
+            </div>
     </div>
 </section>
 <footer>
@@ -66,7 +77,23 @@ This is the Official Website of the Bloxd Lobby, procarroties.</li>
 Dros, Buddy, havok, PROGAMINGSG, THEREALCARROTMAN, LightKnightBloxd, Itzyt, Samuyoutuber, fred5orange, W Mon Gaming, Richard, Mukti Chiran, RealJohann</li>
 </ul>
 </footer>
-</body>
 <script src="script.js"></script>
 <script src="slideshow-script.js"></script>
+<script>
+    const listenBtn = document.getElementById('listenBtn');
+    const noThanksBtn = document.getElementById('noThanksBtn');
+    const backgroundMusic = document.getElementById('backgroundMusic');
+
+    listenBtn.addEventListener('click', () => {
+        musicPopup.style.display = 'none';
+        backgroundMusic.play();
+        musicIcon.style.display = 'block';
+    });
+
+    noThanksBtn.addEventListener('click', () => {
+        musicPopup.style.display = 'none';
+    });
+    
+</script>
+</body>
 </html>
